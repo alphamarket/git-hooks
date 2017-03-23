@@ -1,0 +1,7 @@
+#!/usr/bin/env python
+
+import os, sys
+from subprocess import call
+
+for source in ['pivotal-tracker']:
+	os.system("%s-%s %s" %(os.path.abspath(__file__), source, sys.argv[1]))
