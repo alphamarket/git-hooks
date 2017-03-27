@@ -21,8 +21,7 @@ def get_story():
     branchname = subprocess.check_output(["/usr/bin/git", "rev-parse", "--abbrev-ref", "HEAD"])
     match = re.match(pattern, branchname)
 
-    if not match:
-        raise ValueError("Branch name not in proper format[%s]: %s" %(pattern, branchname))
+    if not match: return False
 
     return match.group('ticket')
 
@@ -45,6 +44,7 @@ def prepend_commit_msg(story):
 def main():
     try:
         story = get_story()
+        if not story: return
         prepend_commit_msg(story)
     except Exception, e:
         sys.stderr.write(str(e))
