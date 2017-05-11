@@ -10,7 +10,7 @@ import re, sys, subprocess
 # Change the pattern if you put the Pivotal Tracker ticket number
 # in a different position, such as at the end of the branch name.
 # The story type of current branchh
-story_type = "feature|chore|bug|release"
+story_type = "fix|feature|chore|bug|release"
 # The pattern of branch name 
 pattern = r"^(%s)/#(?P<ticket>\d+)-.+" %story_type
 # The Pivotal Tracker story phases
