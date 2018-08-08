@@ -6,19 +6,20 @@
 import re, sys, subprocess
 
 # Regex pattern for gitbranch name.
-# Example: feature/123456-my-cool-feature
+# Example: feature/#123456-my-cool-feature [`-my-cool-feature`: is optional]
 # Change the pattern if you put the Pivotal Tracker ticket number
 # in a different position, such as at the end of the branch name.
 # The story type of current branchh
 story_type = "fix|feature|chore|bug|release"
 # The pattern of branch name 
-pattern = r"^(%s)/#(?P<ticket>\d+)-.+" %story_type
+pattern = r"^(%s)/#(?P<ticket>\d+)(-.+)?" %story_type
 # The Pivotal Tracker story phases
 phases = "fixes|fixed|finishes|finished|completes|completed|delivers|deliver"
 
 def get_story():
     """Return the story id number associated with the current feature branch"""
-    branchname = subprocess.check_output(["/usr/bin/git", "rev-parse", "--abbrev-ref", "HEAD"])
+    branchname = subprocess.check_output(["/usr/bin/git", "rev-parse", "--abbrev-ref", "HEAD"]).strip()
+    
     match = re.match(pattern, branchname)
 
     if not match: return False
@@ -30,14 +31,14 @@ def prepend_commit_msg(story):
     msgfile = sys.argv[1]
 
     with open(msgfile) as f:
-        contents = f.read()
+        contents = f.read().strip()
 
     with open(msgfile, 'w') as f:
         match = re.match(r"^[\s|\n|\t]*\[(%s)\].*" %phases, contents)
         opt = ""
         if match: opt = "%s " %match.group(1)
-        # Don't add if it's already there
-        if ('#' + story) not in contents:
+        # Don't add if it's already there, and there are not any other story tag
+        if ('#' + story) not in contents and not re.match(r'^\s*\[(%s)?\s*#\d+\].*' %phases, contents):
             f.write("[%s#%s] " %(opt, story))
         f.write(re.sub(r"^([\s|\n|\t]*\[(%s)\]\s*)(.*)" %phases, r"\3", contents).strip())
 
